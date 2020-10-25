@@ -2,5 +2,5 @@
 ** DONE would be nice to be able to specify if a sprite animation is continuous or should have a delay
 *** maybe we should shadow the animations map into the sprite container and provide details there?
 *** maybe we can just add more data into the animations map and use that?
-** TODO should display the name of the current sprite on screen (:sprite-group)
-** TODO should display the name of the current animation on screen
+** DONE should display the name of the current sprite on screen (:sprite-group)
+** DONE should display the name of the current animation on screen

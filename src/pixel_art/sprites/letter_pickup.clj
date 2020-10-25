@@ -1,5 +1,6 @@
 (ns pixel-art.sprites.letter-pickup
-  (:require [quip.sprite :as qpsprite]))
+  (:require [quip.sprite :as qpsprite]
+            [quip.utils :as qpu]))
 
 (defn init
   []

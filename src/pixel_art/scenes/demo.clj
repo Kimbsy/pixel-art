@@ -1,8 +1,9 @@
 (ns pixel-art.scenes.demo
   (:require [pixel-art.sprites.letter-pickup :as letter-pickup]
             [pixel-art.sprites.squishy-cube :as squishy-cube]
-            [quip.utils :as qpu]
-            [quip.sprite :as qpsprite]))
+            [quil.core :as q]
+            [quip.sprite :as qpsprite]
+            [quip.utils :as qpu]))
 
 ;; LIST OF SPRITES
 (defn sprites
@@ -31,11 +32,18 @@
 
 (defn draw-demo
   [{:keys [current-sprite-idx] :as state}]
-  (let [{background-color             :background-color
-         {:keys [draw-fn] :as sprite} :sprite
+  (let [{background-color :background-color
+         {:keys [draw-fn sprite-group current-animation] :as sprite} :sprite
          :or {background-color qpu/black}}
         (get-in state [:scenes :demo :sprites current-sprite-idx])]
     (qpu/background background-color)
+    (qpu/fill qpu/black)
+    (let [width (+ 20 (* 10 (max (count (str sprite-group))
+                                 (count (str current-animation)))))]
+      (q/rect 0 0 width 70))
+    (qpu/fill qpu/white)
+    (q/text (str sprite-group) 10 25)
+    (q/text (str current-animation) 10 50)
     (draw-fn sprite)))
 
 (defn modify-current-sprite-idx
@@ -49,11 +57,13 @@
   [{:keys [current-sprite-idx] :as state} f]
   (update-in state [:scenes :demo :sprites current-sprite-idx]
              (fn [{current-animation-idx :current-animation-idx
-                   {:keys [animations] :as sprite} :sprite}]
+                   {:keys [animations] :as sprite} :sprite
+                   :as container}]
                (let [new-animation-idx (mod (f current-animation-idx) (count animations))
                      new-animation (nth (keys animations) new-animation-idx)]
-                 {:current-animation-idx new-animation-idx
-                  :sprite (qpsprite/set-animation sprite new-animation)}))))
+                 (merge container
+                        {:current-animation-idx new-animation-idx
+                         :sprite (qpsprite/set-animation sprite new-animation)})))))
 
 (defn key-pressed-fns
   []

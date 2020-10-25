@@ -5,6 +5,7 @@
 (defn init
   []
   {:current-animation-idx 0
+   :background-color qpu/grey
    :sprite
    (qpsprite/animated-sprite :player
                              [400 300]

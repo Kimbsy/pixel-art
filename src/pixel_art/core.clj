@@ -1,11 +1,12 @@
 (ns pixel-art.core
   (:gen-class)
   (:require [pixel-art.scenes.demo :as demo]
-            [quip.core :as qp]
-            [quip.utils :as qpu]))
+            [quil.core :as q]
+            [quip.core :as qp]))
 
 (defn setup
   []
+  (q/text-font (q/create-font "Ubuntu Mono Bold" 20))
   {:current-sprite-idx 0
    :pause-timer        0})
 
