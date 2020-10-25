@@ -16,11 +16,14 @@
                                                  :frame-delay 10}
                                           :jump {:frames      6
                                                  :y-offset    1
-                                                 :frame-delay 5}
+                                                 :frame-delay 5
+                                                 :cycle-pause 60}
                                           :dash {:frames      6
                                                  :y-offset    2
-                                                 :frame-delay 5}
+                                                 :frame-delay 5
+                                                 :cycle-pause 60}
                                           :turn {:frames      6
                                                  :y-offset    3
-                                                 :frame-delay 2}}
+                                                 :frame-delay 2
+                                                 :cycle-pause 60}}
                              :current-animation :idle)})

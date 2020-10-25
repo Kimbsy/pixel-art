@@ -6,7 +6,8 @@
 
 (defn setup
   []
-  {:current-sprite-idx 0})
+  {:current-sprite-idx 0
+   :pause-timer        0})
 
 (defn init-scenes
   []

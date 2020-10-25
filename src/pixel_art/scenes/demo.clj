@@ -4,11 +4,30 @@
             [quip.utils :as qpu]
             [quip.sprite :as qpsprite]))
 
+;; LIST OF SPRITES
+(defn sprites
+  []
+  [(squishy-cube/init)
+   (letter-pickup/init)])
+
 (defn update-demo
-  [{:keys [current-sprite-idx] :as state}]
-  (update-in state [:scenes :demo :sprites current-sprite-idx :sprite]
-             (fn [{:keys [update-fn] :as sprite}]
-               (update-fn sprite))))
+  [{:keys [current-sprite-idx pause-timer] :as state}]
+  (let [{:keys [animations current-animation update-fn] :as sprite}
+        (get-in state [:scenes :demo :sprites current-sprite-idx :sprite])
+
+        {:keys [frame-delay] :as animation} (current-animation animations)]
+    (if (zero? pause-timer)
+      (let [{:keys [animation-frame] :as updated-sprite} (update-fn sprite)
+            cycle-pause (or (:cycle-pause animation) 0)]
+        (if (zero? animation-frame)
+          (-> state
+              (assoc :pause-timer cycle-pause)
+              (assoc-in [:scenes :demo :sprites current-sprite-idx :sprite]
+                        (-> updated-sprite
+                            (assoc :delay-count (dec frame-delay)))))
+          (assoc-in state [:scenes :demo :sprites current-sprite-idx :sprite]
+                    updated-sprite)))
+      (update state :pause-timer dec))))
 
 (defn draw-demo
   [{:keys [current-sprite-idx] :as state}]
@@ -18,12 +37,6 @@
         (get-in state [:scenes :demo :sprites current-sprite-idx])]
     (qpu/background background-color)
     (draw-fn sprite)))
-
-;; LIST OF SPRITES
-(defn sprites
-  []
-  [(squishy-cube/init)
-   (letter-pickup/init)])
 
 (defn modify-current-sprite-idx
   [state f]
@@ -46,19 +59,27 @@
   []
   [(fn [state {k :key :as e}]
      (if (= :left k)
-       (modify-current-sprite-idx state inc)
+       (-> state
+           (modify-current-sprite-idx inc)
+           (assoc :pause-timer 0))
        state))
    (fn [state {k :key :as e}]
      (if (= :right k)
-       (modify-current-sprite-idx state dec)
+       (-> state
+           (modify-current-sprite-idx dec)
+           (assoc :pause-timer 0))
        state))
    (fn [state {k :key :as e}]
      (if (= :up k)
-       (modify-current-animation-idx state inc)
+       (-> state
+           (modify-current-animation-idx inc)
+           (assoc :pause-timer 0))
        state))
    (fn [state {k :key :as e}]
      (if (= :down k)
-       (modify-current-animation-idx state dec)
+       (-> state
+           (modify-current-animation-idx dec)
+           (assoc :pause-timer 0))
        state))])
 
 (defn init

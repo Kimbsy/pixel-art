@@ -14,5 +14,6 @@
                                                       :frame-delay 6}
                                           :activated {:frames      10
                                                       :y-offset    1
-                                                      :frame-delay 2}}
+                                                      :frame-delay 2
+                                                      :cycle-pause 60}}
                              :current-animation :mutate)})
