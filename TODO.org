@@ -4,3 +4,5 @@
 *** maybe we can just add more data into the animations map and use that?
 ** DONE should display the name of the current sprite on screen (:sprite-group)
 ** DONE should display the name of the current animation on screen
+** TODO would be nice to be able to specify a sequence of animations to execute
+*** would want to specify a period in frames or cycles for each animation

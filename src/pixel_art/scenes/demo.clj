@@ -1,6 +1,7 @@
 (ns pixel-art.scenes.demo
   (:require [pixel-art.sprites.letter-pickup :as letter-pickup]
             [pixel-art.sprites.squishy-cube :as squishy-cube]
+            [pixel-art.sprites.explosion-01 :as explosion-01]
             [quil.core :as q]
             [quip.sprite :as qpsprite]
             [quip.utils :as qpu]))
@@ -9,25 +10,28 @@
 (defn sprites
   []
   [(squishy-cube/init)
-   (letter-pickup/init)])
+   (letter-pickup/init)
+   (explosion-01/init)])
 
 (defn update-demo
   [{:keys [current-sprite-idx pause-timer] :as state}]
-  (let [{:keys [animations current-animation update-fn] :as sprite}
+  (let [{:keys [animations current-animation update-fn pausing] :as sprite}
         (get-in state [:scenes :demo :sprites current-sprite-idx :sprite])
 
-        {:keys [frame-delay] :as animation} (current-animation animations)]
+        {:keys [frame-delay frames] :as animation} (current-animation animations)
+        cycle-pause (or (:cycle-pause animation) 0)]
     (if (zero? pause-timer)
-      (let [{:keys [animation-frame] :as updated-sprite} (update-fn sprite)
-            cycle-pause (or (:cycle-pause animation) 0)]
-        (if (zero? animation-frame)
-          (-> state
-              (assoc :pause-timer cycle-pause)
-              (assoc-in [:scenes :demo :sprites current-sprite-idx :sprite]
-                        (-> updated-sprite
-                            (assoc :delay-count (dec frame-delay)))))
-          (assoc-in state [:scenes :demo :sprites current-sprite-idx :sprite]
-                    updated-sprite)))
+      (if (and (= (:animation-frame sprite) (dec frames))
+               (not pausing))
+        (-> state
+            (assoc :pause-timer cycle-pause)
+            (assoc-in [:scenes :demo :sprites current-sprite-idx :sprite]
+                      (-> sprite
+                          (assoc :pausing true)
+                          (assoc :delay-count (dec frame-delay)))))
+        (assoc-in state [:scenes :demo :sprites current-sprite-idx :sprite]
+                  (-> (update-fn sprite)
+                      (dissoc :pausing))))
       (update state :pause-timer dec))))
 
 (defn draw-demo
@@ -70,13 +74,13 @@
   [(fn [state {k :key :as e}]
      (if (= :left k)
        (-> state
-           (modify-current-sprite-idx inc)
+           (modify-current-sprite-idx dec)
            (assoc :pause-timer 0))
        state))
    (fn [state {k :key :as e}]
      (if (= :right k)
        (-> state
-           (modify-current-sprite-idx dec)
+           (modify-current-sprite-idx inc)
            (assoc :pause-timer 0))
        state))
    (fn [state {k :key :as e}]
